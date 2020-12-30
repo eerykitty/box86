@@ -70,6 +70,7 @@ void fpu_fbld(x86emu_t* emu, uint8_t* s) {
 #define FPU_t fpu_reg_t
 #define BIAS80 16383
 #define BIAS64 1023
+
 // long double (80bits) -> double (64bits)
 void LD2D(void* ld, void* d)
 {
@@ -139,6 +140,30 @@ void LD2D(void* ld, void* d)
 	result.l.upper |= (sign <<31)|((exp64final&0x7ff) << 20);
 
 	*(uint64_t*)d = result.ll;
+}
+
+// IEEE x87 long double (80bits) -> IBM long double (128bits)
+
+union ibm128_union {
+  long double ibm128;
+  double dbl[2];
+};
+
+void LD2IBMLD(void* ld, void* ibm_ld)
+{
+  union ibm128_union u;
+  double high, low;
+  long double tmp;
+  LD2D(ld, &high);
+  if (isnan(high) || isinf(high)) {
+    low = 0.0;
+  } else {
+    low = high;
+  }
+
+  u.dbl[0] = high;
+  u.dbl[1] = low;
+  *(long double*)ibm_ld = u.ibm128;
 }
 
 // double (64bits) -> long double (80bits)

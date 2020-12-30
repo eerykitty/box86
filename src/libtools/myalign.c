@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <float.h>
 #include <wchar.h>
 #include <sys/epoll.h>
 #include <fts.h>
@@ -20,6 +21,7 @@ void myStackAlign(const char* fmt, uint32_t* st, uint32_t* mystack)
     const char* p = fmt;
     int state = 0;
     double d;
+    long double ld;
     while(*p)
     {
         switch(state) {
@@ -98,12 +100,20 @@ void myStackAlign(const char* fmt, uint32_t* st, uint32_t* mystack)
                 st+=3; mystack+=3;
                 #else
                 // there is no long double on ARM, so tranform that in a regular double
+                #ifndef POWERPCLE
                 LD2D((void*)st, &d);
                 if((((uint32_t)mystack)&0x7)!=0)
                     mystack++;
                 *(uint64_t*)mystack = *(uint64_t*)&d;
                 st+=3; mystack+=2;
-                #endif
+                #else
+                LD2IBMLD((void*)st, &ld);
+                if((((uint32_t)mystack)&0xF)!=0)
+                  mystack++;
+                *(long double*)mystack = *(long double*)st;
+                st+=3; mystack+=4;
+                #endif // POWERPCLE
+                #endif // HAVE_LD80BITS
                 state = 0;
                 ++p;
                 break;
@@ -313,6 +323,7 @@ void myStackAlignW(const char* fmt, uint32_t* st, uint32_t* mystack)
     const wchar_t* p = (const wchar_t*)fmt;
     int state = 0;
     double d;
+    long double ld;
     while(*p)
     {
         switch(state) {
@@ -391,12 +402,20 @@ void myStackAlignW(const char* fmt, uint32_t* st, uint32_t* mystack)
                 st+=3; mystack+=3;
                 #else
                 // there is no long double on ARM, so tranform that in a regular double
+                #ifndef POWERPCLE
                 LD2D((void*)st, &d);
                 if((((uint32_t)mystack)&0x7)!=0)
                     mystack++;
                 *(uint64_t*)mystack = *(uint64_t*)&d;
                 st+=3; mystack+=2;
-                #endif
+                #else
+                LD2IBMLD((void*)st, &ld);
+                if((((uint32_t)mystack)&0xF)!=0)
+                  mystack++;
+                *(long double*)mystack = *(long double*)st;
+                st+=3; mystack+=4;
+                #endif // POWERPCLE
+                #endif // HAVE_LD80BITS
                 state = 0;
                 ++p;
                 break;

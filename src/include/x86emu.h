@@ -47,9 +47,10 @@ void UnimpOpcode(x86emu_t* emu);
 
 uint64_t ReadTSC(x86emu_t* emu);
 
-double FromLD(void* ld);        // long double (80bits pointer) -> double
-void LD2D(void* ld, void* d);   // long double (80bits) -> double (64bits)
-void D2LD(void* d, void* ld);   // double (64bits) -> long double (64bits)
+double FromLD(void* ld);          // long double (80bits pointer) -> double
+void LD2D(void* ld, void* d);     // long double (80bits) -> double (64bits)
+void LD2IBMLD(void* ld, void* ibm_ld); // long double (80bits) -> IBM long double 
+void D2LD(void* d, void* ld);     // double (64bits) -> long double (64bits)
 
 void printFunctionAddr(uintptr_t nextaddr, const char* text);
 const char* getAddrFunctionName(uintptr_t addr);
