@@ -1,10 +1,12 @@
 #include <stdint.h>
 
 #define CREATE_SYSV_VALIST \
+  void* reg_scratch = 0; \
   va_list sysv_varargs; \
-  sysv_varargs->gpr=8; \
-  sysv_varargs->fpr=8; \
-  sysv_varargs->overflow_arg_area=emu->scratch;
+  sysv_varargs->gpr=50; \
+  sysv_varargs->fpr=50; \
+  sysv_varargs->overflow_arg_area=emu->scratch; \
+  sysv_varargs->reg_save_area=0;
 
 #ifdef SYSV_VARARG
 #define VARARGS sysv_varargs

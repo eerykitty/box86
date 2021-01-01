@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/select.h>
+#include <linux/ioctl.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <glob.h>
@@ -24,6 +28,7 @@
 #include <poll.h>
 #include <sys/epoll.h>
 #include <ftw.h>
+#include <syslog.h>
 #include <sys/syscall.h> 
 #include <sys/socket.h>
 #include <sys/utsname.h>
@@ -2532,6 +2537,106 @@ EXPORT void my_mcount(void* frompc, void* selfpc)
 {
     // stub doing nothing...
     return;
+}
+
+EXPORT void my_vsyslog(x86emu_t* emu, int priority, const char *fmt, uint32_t* b, va_list V)
+{
+      myStackAlign((const char*)fmt, (uint32_t*)b, emu->scratch);
+      PREPARE_VALIST
+
+      void* f = vsyslog;
+      return vsyslog(priority, fmt, VARARGS);
+}
+
+#define FIX_IOCTL(x86, powerpc) \
+	case x86 : request = powerpc; break;
+
+EXPORT int my_ioctl(x86emu_t* emu, int fd, unsigned long int request, void *arg)
+{
+  printf("unmodified request is %lx\n", request);
+  switch(request) {
+    FIX_IOCTL(0x5452, (_IOW('f', 125, int)));
+    FIX_IOCTL(0x5451, (_IO('f', 1)));
+    FIX_IOCTL(0x5421, (_IOW('f', 126, int)));
+    FIX_IOCTL(0x5450, (_IO('f', 2)));
+    FIX_IOCTL(0x541B, (_IOR('f', 127, int)));
+    FIX_IOCTL(0x5460, (_IOR('f', 128, loff_t)));
+    FIX_IOCTL(0x540B, (_IO('t', 31)));
+    FIX_IOCTL(0x5405, (_IOR('t', 23, struct termio)));
+    FIX_IOCTL(0x5401, (_IOR('t', 19, struct termios)));
+    FIX_IOCTL(0x5409, (_IO('t', 29)));
+    FIX_IOCTL(0x5425, (0x5425));
+    FIX_IOCTL(0x5406, (_IOW('t', 24, struct termio)));
+    FIX_IOCTL(0x5408, (_IOW('t', 28, struct termio)));
+    FIX_IOCTL(0x5407, (_IOW('t', 25, struct termio)));
+    FIX_IOCTL(0x5402, (_IOW('t', 20, struct termios)));
+    FIX_IOCTL(0x5404, (_IOW('t', 22, struct termios)));
+    FIX_IOCTL(0x5403, (_IOW('t', 21, struct termios)));
+    FIX_IOCTL(0x540A, (_IO('t', 30)));
+    FIX_IOCTL(0x5428, (0x5428));
+    FIX_IOCTL(0x541D, (0x541D));
+    FIX_IOCTL(0x540C, (0x540C));
+    FIX_IOCTL(0x80045432, (_IOR('T',0x32, unsigned int)));
+    FIX_IOCTL(0x5424, (0x5424));
+    FIX_IOCTL(0x80045440, (_IOR('T', 0x40, int)));
+    FIX_IOCTL(0x545D, (0x545D));
+    FIX_IOCTL(0x5456, (0x5456));
+    FIX_IOCTL(0x540F, (_IOR('t', 119, int)));
+    FIX_IOCTL(0x80045438, (_IOR('T', 0x38, int)));
+    FIX_IOCTL(0x80045439, (_IOR('T', 0x39, int)));
+    FIX_IOCTL(0x80045430, (_IOR('T',0x30, unsigned int)));
+    FIX_IOCTL(0x5441, (_IO('T', 0x41)));
+    FIX_IOCTL(0x542E, (0x542e));
+    FIX_IOCTL(0x541E, (0x541E));
+    FIX_IOCTL(0x5429, (0x5429));
+    FIX_IOCTL(0x5419, (0x5419));
+    FIX_IOCTL(0x5413, (_IOR('t', 104, struct winsize)));
+    FIX_IOCTL(0x541C, (0x541C));
+    FIX_IOCTL(0x5417, (0x5417));
+    FIX_IOCTL(0x5416, (0x5416));
+    FIX_IOCTL(0x5415, (0x5415));
+    FIX_IOCTL(0x545C, (0x545C));
+    FIX_IOCTL(0x5418, (0x5418));
+    FIX_IOCTL(0x5422, (0x5422));
+    FIX_IOCTL(0x540D, (0x540D));
+    FIX_IOCTL(0x5411, (_IOR('t', 115, int)));
+    FIX_IOCTL(0x5420, (0x5420));
+    FIX_IOCTL(0, (0));
+    FIX_IOCTL(32, (32));
+    FIX_IOCTL(1, (1));
+    FIX_IOCTL(2, (2));
+    FIX_IOCTL(64, (64));
+    FIX_IOCTL(16, (16));
+    FIX_IOCTL(8, (8));
+    FIX_IOCTL(4, (4));
+    FIX_IOCTL(0x5427, (0x5427));
+    FIX_IOCTL(0x540E, (0x540E));
+    FIX_IOCTL(0x5453, (0x5453));
+    FIX_IOCTL(0x5459, (0x5459));
+    FIX_IOCTL(0x545A, (0x545A));
+    FIX_IOCTL(0x5458, (0x5458));
+    FIX_IOCTL(0x5454, (0x5454));
+    FIX_IOCTL(0x545B, (0x545B));
+    FIX_IOCTL(0x5455, (0x5455));
+    FIX_IOCTL(0x5423, (0x5423));
+    FIX_IOCTL(0x40045436, (_IOW('T',0x36, int)));
+    FIX_IOCTL(0x5457, (0x5457));
+    FIX_IOCTL(0x5410, (_IOW('t', 118, int)));
+    FIX_IOCTL(0x40045431, (_IOW('T',0x31, int)));
+    FIX_IOCTL(0x542F, (0x542f));
+    FIX_IOCTL(0x541F, (0x541F));
+    FIX_IOCTL(0x541A, (0x541A));
+    FIX_IOCTL(0x5412, (0x5412));
+    FIX_IOCTL(0x5414, (_IOW('t', 103, struct winsize)));
+    FIX_IOCTL(0x5437, (0x5437));
+  }
+  if(request == 0x80046601 || request == 0x82187201) {
+    return 0;
+  }
+  printf("ioctl %i %lx\n", fd, request);
+  int result = ioctl(fd, request, arg);
+  printf("ioctl result is %i\n", result);
+  return result;
 }
 
 union semun {

@@ -303,9 +303,9 @@ GOW(fchown, iFiuu)
 GO(fchownat, iFipuii)
 GO(fclose, iFp)
 GOW(fcloseall, iFv)
-GOM(fcntl, iFEiiuuuuuu)  // this also use a vararg for 3rd argument
-GOM(__fcntl, iFEiiuuuuuu)
-GOM(fcntl64, iFEiiuuuuuu)
+GOM(fcntl, iFEiiuuuuuuuuuuuuuuu)  // this also use a vararg for 3rd argument
+GOM(__fcntl, iFEiiuuuuuuuuuuuuu)
+GOM(fcntl64, iFEiiuuuuuuuuuuuuu)
 GO(fcvt, pFdipp)
 GO(fcvt_r, iFdipppL)
 GO(fdatasync, iFi)
@@ -714,7 +714,7 @@ DATA(_IO_2_1_stdin_, 152)
 DATA(_IO_2_1_stdout_, 152)
 GO(_IO_adjust_column, uFupi)
 // _IO_adjust_wcolumn
-GO(ioctl, iFiLN)   //the vararg is just to have optional arg of various type, but only 1 arg
+GOM(ioctl, iFEiUU)
 GO(_IO_default_doallocate, iFS)
 GO(_IO_default_finish, vFSi)
 GO(_IO_default_pbackfail, iFSi)
@@ -1774,6 +1774,7 @@ DATA(_sys_errlist, 4)
 DATA(sys_errlist, 4)
 GO(sysinfo, iFp)
 GO2(syslog, vFiV, vsyslog)
+GOM(vsyslog, vFEipV)
 GO2(__syslog_chk, vFiipV, __vsyslog_chk)
 DATA(_sys_nerr, 4)    // type R
 DATA(sys_nerr, 4) // type R
